@@ -15,9 +15,9 @@ namespace NitroxModel.Discovery
                 }
             }
 
-            if (File.Exists(Path.Combine(subnauticaPath, "Subnautica_Data", "Plugins", "CSteamworks.dll")))
+            if (File.Exists(Path.Combine(subnauticaPath, "Subnautica_Data", "Plugins", "steam_api64.dll")))
             {
-                return Platform.STEAM;
+                return Platform.EPIC;
             }
 
             if (File.Exists(Path.Combine(subnauticaPath, "appxmanifest.xml")))
