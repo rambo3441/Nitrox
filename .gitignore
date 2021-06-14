@@ -79,14 +79,7 @@ artifacts/
 *.pidb
 *.svclog
 *.scc
-
-# Chutzpah Test files
-_Chutzpah*
-<<<<<<< HEAD
 .github/
-=======
-
->>>>>>> 536c6649a4e956d795cf254acd417def08f4824d
 # Visual C++ cache files
 ipch/
 *.aps
