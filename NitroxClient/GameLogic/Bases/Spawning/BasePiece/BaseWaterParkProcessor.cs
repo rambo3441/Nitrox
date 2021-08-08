@@ -1,10 +1,10 @@
 ﻿using NitroxClient.MonoBehaviours;
 using NitroxModel.DataStructures;
-using UnityEngine;
-using NitroxModel.Logger;
 using NitroxModel.Helper;
+using NitroxModel.Logger;
+using UnityEngine;
 
-namespace NitroxClient.GameLogic.Bases.Spawning
+namespace NitroxClient.GameLogic.Bases.Spawning.BasePiece
 {
     /*
      * When a Alien Containment Unit is created, multiple objects are spawned: the main world object (WaterParkPiece) and
@@ -12,19 +12,19 @@ namespace NitroxClient.GameLogic.Bases.Spawning
      * contains a Planter.  When the object spawns, we use this class to set a deterministic id seeded by the parent id. 
      * This keeps inventory actions in sync and allows for persistent storage of each container's contents.
      */
-    public class BaseRoomWaterParkProcessor: BasePieceSpawnProcessor
+    public class BaseRoomWaterParkProcessor : BasePieceSpawnProcessor
     {
-        public override TechType[] ApplicableTechTypes { get; } =
+        protected override TechType[] ApplicableTechTypes { get; } =
         {
             TechType.BaseWaterPark
         };
 
-        public override void SpawnPostProcess(Base latestBase, Int3 latestCell, GameObject finishedPiece)
+        protected override void SpawnPostProcess(Base latestBase, Int3 latestCell, GameObject finishedPiece)
         {
             NitroxId pieceId = NitroxEntity.GetId(finishedPiece);
 
             WaterParkPiece waterParkPiece = finishedPiece.GetComponent<WaterParkPiece>();
-            if(!waterParkPiece)
+            if (!waterParkPiece)
             {
                 // The BaseWater has multiple base pieces, but only one of them (the bottom) contains the WaterParkPiece component...
                 return;
