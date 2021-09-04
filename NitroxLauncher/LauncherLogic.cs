@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using NitroxLauncher.Events;
 using NitroxLauncher.Pages;
 using NitroxLauncher.Patching;
@@ -16,6 +17,7 @@ using NitroxModel;
 using NitroxModel.Discovery;
 using NitroxModel.Helper;
 using NitroxModel.Logger;
+using NitroxModel.OS;
 
 namespace NitroxLauncher
 {
@@ -65,7 +67,6 @@ namespace NitroxLauncher
             try
             {
                 nitroxEntryPatch.Remove();
-                QModHelper.RestoreQModEntryPoint(subnauticaPath);
             }
             catch (Exception)
             {
@@ -128,6 +129,18 @@ namespace NitroxLauncher
             lastFindSubnauticaTask = Task.Factory.StartNew(() =>
             {
                 PirateDetection.TriggerOnDirectory(path);
+                
+                // TODO: Move this if block to another place where Nitrox installation is verified (will be clear with new Nitrox Launcher design).
+                if (!FileSystem.Instance.SetFullAccessToCurrentUser(Directory.GetCurrentDirectory()) || !FileSystem.Instance.SetFullAccessToCurrentUser(path))
+                {
+                    Dispatcher.CurrentDispatcher.BeginInvoke(() =>
+                    {
+                        MessageBox.Show(Application.Current.MainWindow!, "Restart Nitrox Launcher as admin to allow Nitrox to change permissions as needed. This is only needed once. Nitrox will close after this message.", "Required file permission error", MessageBoxButton.OK,
+                                        MessageBoxImage.Error);
+                        Environment.Exit(1);
+                    }, DispatcherPriority.ApplicationIdle);
+                }
+                
                 try
                 {
                     File.WriteAllText("path.txt", path);
@@ -195,7 +208,6 @@ namespace NitroxLauncher
             }
 #endif
             nitroxEntryPatch.Remove();
-            QModHelper.RestoreQModEntryPoint(subnauticaPath);
             gameProcess = StartSubnautica() ?? await WaitForProcessAsync();
         }
 
@@ -239,7 +251,10 @@ namespace NitroxLauncher
             }
             nitroxEntryPatch.Remove();
             nitroxEntryPatch.Apply();
-            QModHelper.RemoveQModEntryPoint(subnauticaPath);
+            if (QModHelper.IsQModInstalled(subnauticaPath))
+            {
+                Log.Warn("QModManager is Installed! Please Direct user to MrPurple6411#0415.");
+            }
 
             gameProcess = StartSubnautica() ?? await WaitForProcessAsync();
         }
@@ -345,7 +360,6 @@ namespace NitroxLauncher
             {
                 nitroxEntryPatch.Remove();
                 Log.Info("Finished removing patches!");
-                QModHelper.RestoreQModEntryPoint(subnauticaPath);
             }
             catch (Exception ex)
             {
